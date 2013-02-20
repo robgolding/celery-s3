@@ -11,6 +11,7 @@ setup(
     url='https://github.com/robgolding63/celery-s3',
     download_url='https://github.com/robgolding63/celery-s3/downloads',
     packages=find_packages(),
+    include_package_data=True,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
