@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Celery-s3 : An S3 result backend for Celery." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Celery-s3</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/robgolding63/celery-s3">View on GitHub</a>
+
+          <h1 id="project_title">Celery-s3</h1>
+          <h2 id="project_tagline">An S3 result backend for Celery.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/robgolding63/celery-s3/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/robgolding63/celery-s3/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>Welcome</h1>
+
+<p>celery-s3 is a simple S3 result backend for Celery.</p>
+
+<p>If used in conjunction with the SQS broker, it allows for Celery deployments
+that use only distributed AWS services -- with no dependency on individual
+machines within your infrastructure.</p>
+
+<p>This backend probably isn't suitable for particularly high-traffic Celery
+deployments, but it works just fine in general -- and imposes no limits on the
+number of workers in the pool.</p>
+
+<h2>Installation</h2>
+
+<p>Install via pip:</p>
+
+<p><code>pip install celery-s3</code></p>
+
+<p>Then configure Celery to use the <code>S3Backend</code>:</p>
+
+<pre><code>CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
+
+CELERY_S3_BACKEND_SETTINGS = {
+    'aws_access_key_id': '&lt;your_aws_access_key_id&gt;',
+    'aws_secret_access_key': '&lt;your_aws_secret_access_key&gt;',
+    'bucket': '&lt;your_bucket_name&gt;',
+}
+</code></pre>
+
+<h2>Configuration</h2>
+
+<p>To use a folder within the specified bucket, set the <code>base_path</code> in your
+<code>CELERY_S3_BACKEND_SETTINGS</code>:</p>
+
+<pre><code>CELERY_S3_BACKEND_SETTINGS = {
+    ...
+    'base_path': '/celery/',
+    ...
+}
+</code></pre>
+
+<h2>Notes</h2>
+
+<p>Storing Celery results with this backend will obviously result in API calls
+being made to Amazon S3.  For each result, at least one <code>PUT</code> request will be
+made (priced at $0.01 per 1,000 requests at the time of writing).  Also, the
+data contained within the result object will be stored indefinitely, unless
+otherwise specified.</p>
+
+<p>To fetch a result for a task that has already finished, at least two requests
+will be made (one <code>HEAD</code> and one <code>GET</code>).  If you use Celery's <code>result.get()</code> to
+wait for a task to finish, S3 will be polled continuously until the task has
+finished.</p>
+
+<p>By default, the poll interval is set to 0.5 seconds, which could result in
+a lot of requests (two <code>HEAD</code> requests per second until the task has finished,
+then one <code>GET</code> request to fetch the result).  If you need to use
+<code>result.get()</code>, consider increasing the interval and using a timeout to prevent
+polling forever: <code>result.get(interval=5, timeout=600)</code>.</p>
+
+<p>Also, for tasks whose result you don't need, be sure to use <code>ignore_result</code>:</p>
+
+<pre><code>@celery.task(ignore_result=True)
+def process_data(obj):
+    obj.do_processing()
+</code></pre>
+
+<p>Once task results have been used and are no longer needed, be sure to call
+<code>result.forget()</code> to delete the corresponding S3 key.  Otherwise, old results
+will remain forever and contribute to storage costs (storage is priced at
+$0.095 per GB per month at the time of writing).</p>
+
+<p>Also, the S3 lifecycle can be used to archive or delete old keys after
+a certain period of time.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Celery-s3 maintained by <a href="https://github.com/robgolding63">robgolding63</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
