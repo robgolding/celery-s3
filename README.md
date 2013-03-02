@@ -1,6 +1,6 @@
-# celery-s3
+# Celery-S3
 
-celery-s3 is a simple S3 result backend for Celery.
+Celery-S3 is a simple S3 result backend for Celery.
 
 If used in conjunction with the SQS broker, it allows for Celery deployments
 that use only distributed AWS services -- with no dependency on individual
