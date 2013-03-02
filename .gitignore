@@ -1,1 +1,5 @@
 *.pyc
+*~
+celery_s3.egg-info
+/dist
+/build
