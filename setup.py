@@ -12,9 +12,13 @@ setup(
     download_url='https://github.com/robgolding63/celery-s3/downloads',
     packages=find_packages(),
     include_package_data=True,
+    install_requires=[
+        'boto>=2.8.0,<3.0',
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
+        'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: System :: Distributed Computing',
         'Programming Language :: Python',
         'Operating System :: OS Independent',
