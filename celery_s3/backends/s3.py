@@ -23,6 +23,7 @@ class S3Backend(KeyValueStoreBackend):
     aws_secret_access_key = None
     bucket_name = None
     base_path = ''
+    use_ssl = True
 
     def __init__(self, **kwargs):
         super(S3Backend, self).__init__(**kwargs)
@@ -38,6 +39,8 @@ class S3Backend(KeyValueStoreBackend):
                                             self.aws_secret_access_key)
             self.bucket_name = config.get('bucket', self.bucket_name)
             self.base_path = config.get('base_path', self.base_path)
+            self.use_ssl = (str.lower(config.get('use_ssl', str(self.use_ssl))) == 'true')
+            
 
     def _get_key(self, key):
         k = Key(self. s3_bucket)
@@ -60,10 +63,9 @@ class S3Backend(KeyValueStoreBackend):
 
     @cached_property
     def s3_bucket(self):
-        #conn = S3Connection(self.aws_access_key_id, self.aws_secret_access_key)
 	conn = connect_to_region(self.aws_region,
             aws_access_key_id=self.aws_access_key_id,
             aws_secret_access_key=self.aws_secret_access_key,
-            is_secure=True,               # uncommmnt if you are not using ssl
+            is_secure=self.use_ssl,               # uncommmnt if you are not using ssl
             calling_format = OrdinaryCallingFormat() )
         return Bucket(connection=conn, name=self.bucket_name)
