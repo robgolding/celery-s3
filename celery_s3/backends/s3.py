@@ -1,7 +1,9 @@
 import os
 
+from boto.s3 import connect_to_region
 from boto.s3.bucket import Bucket
 from boto.s3.connection import S3Connection
+from boto.s3.connection import OrdinaryCallingFormat
 from boto.s3.key import Key
 from kombu.utils import cached_property
 
@@ -16,6 +18,7 @@ class S3Backend(KeyValueStoreBackend):
     supports_native_join = False
     implements_incr = False
 
+    aws_region = 'us-east-1'
     aws_access_key_id = None
     aws_secret_access_key = None
     bucket_name = None
@@ -28,6 +31,7 @@ class S3Backend(KeyValueStoreBackend):
             if not isinstance(config, dict):
                 raise ImproperlyConfigured(
                     'S3 backend settings should be grouped in a dict')
+            self.aws_access_key_id = config.get('aws_region', self.aws_region )
             self.aws_access_key_id = config.get('aws_access_key_id',
                                             self.aws_access_key_id)
             self.aws_secret_access_key = config.get('aws_secret_access_key',
@@ -56,5 +60,10 @@ class S3Backend(KeyValueStoreBackend):
 
     @cached_property
     def s3_bucket(self):
-        conn = S3Connection(self.aws_access_key_id, self.aws_secret_access_key)
+        #conn = S3Connection(self.aws_access_key_id, self.aws_secret_access_key)
+	conn = connect_to_region(self.aws_region,
+            aws_access_key_id=self.aws_access_key_id,
+            aws_secret_access_key=self.aws_secret_access_key,
+            is_secure=True,               # uncommmnt if you are not using ssl
+            calling_format = OrdinaryCallingFormat() )
         return Bucket(connection=conn, name=self.bucket_name)
