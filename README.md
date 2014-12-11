@@ -24,6 +24,7 @@ Then configure Celery to use the `S3Backend`:
         'aws_access_key_id': '<your_aws_access_key_id>',
         'aws_secret_access_key': '<your_aws_secret_access_key>',
         'bucket': '<your_bucket_name>',
+        'aws_region': 'us-east-1',
     }
 
 ## Configuration
