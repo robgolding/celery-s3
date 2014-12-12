@@ -24,6 +24,7 @@ class S3Backend(KeyValueStoreBackend):
     bucket_name = None
     base_path = ''
     use_ssl = True
+    use_rr = False
 
     def __init__(self, **kwargs):
         super(S3Backend, self).__init__(**kwargs)
@@ -40,6 +41,7 @@ class S3Backend(KeyValueStoreBackend):
             self.bucket_name = config.get('bucket', self.bucket_name)
             self.base_path = config.get('base_path', self.base_path)
             self.use_ssl = (str.lower(config.get('use_ssl', str(self.use_ssl))) == 'true')
+            self.use_rr = (str.lower(config.get('use_rr', str(self.use_rr))) == 'true')
             
 
     def _get_key(self, key):
@@ -56,7 +58,7 @@ class S3Backend(KeyValueStoreBackend):
         return None
 
     def set(self, key, value):
-        return self._get_key(key).set_contents_from_string(value)
+        return self._get_key(key).set_contents_from_string(value, reduced_redundancy=self.use_rr)
 
     def delete(self, key):
         self._get_key(key).delete()

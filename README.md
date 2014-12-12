@@ -26,6 +26,7 @@ Then configure Celery to use the `S3Backend`:
         'bucket': '<your_bucket_name>',
         'aws_region': '<your S3 bucket region>',
         'use_ssl': '<true or false>',
+        'use_rr': '<true or false>',
     }
 
 ## Configuration
@@ -37,6 +38,15 @@ To use a folder within the specified bucket, set the `base_path` in your
     CELERY_S3_BACKEND_SETTINGS = {
         ...
         'base_path': '/celery/',
+        ...
+    }
+
+
+To use Reduced Redundancy storage in S3, set the `use_rr` in your `CELERY_S3_BACKEND_SETTINGS`:
+
+    CELERY_S3_BACKEND_SETTINGS = {
+        ...
+        'use_rr': 'true',
         ...
     }
 
