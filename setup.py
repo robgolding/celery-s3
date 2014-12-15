@@ -8,8 +8,8 @@ setup(
     author='Rob Golding',
     author_email='rob@robgolding.com',
     license='BSD',
-    url='https://github.com/supericeboy/celery-s3',
-    download_url='https://github.com/supericeboy/celery-s3/downloads',
+    url='https://github.com/robgolding63/celery-s3',
+    download_url='https://github.com/robgolding63/celery-s3/downloads',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
