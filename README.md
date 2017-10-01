@@ -1,5 +1,7 @@
 # Celery-S3
 
+[![Build Status](https://travis-ci.org/robgolding/celery-s3.svg?branch=master)](https://travis-ci.org/robgolding/celery-s3)
+
 Celery-S3 is a simple S3 result backend for Celery.
 
 If used in conjunction with the SQS broker, it allows for Celery deployments
