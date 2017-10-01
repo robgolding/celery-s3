@@ -1,5 +1,9 @@
 from setuptools import setup, find_packages
 
+requirements = [
+    'boto>=2.8.0,<3.0',
+]
+
 setup(
     name='celery-s3',
     version='0.1',
@@ -12,10 +16,8 @@ setup(
     download_url='https://github.com/robgolding63/celery-s3/downloads',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        'boto>=2.8.0,<3.0',
-    ],
-    tests_require=[
+    install_requires=requirements,
+    tests_require=requirements + [
         'celery==4.1.0',
     ],
     test_suite='celery_s3.tests',
