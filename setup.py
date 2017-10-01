@@ -15,6 +15,10 @@ setup(
     install_requires=[
         'boto>=2.8.0,<3.0',
     ],
+    tests_require=[
+        'celery==4.1.0',
+    ],
+    test_suite='celery_s3.tests',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
