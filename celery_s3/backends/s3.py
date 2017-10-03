@@ -3,10 +3,9 @@ import os
 from boto.s3.bucket import Bucket
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-from kombu.utils import cached_property
-
 from celery.backends.base import KeyValueStoreBackend
 from celery.exceptions import ImproperlyConfigured
+from kombu.utils import cached_property
 
 
 class S3Backend(KeyValueStoreBackend):
@@ -27,13 +26,24 @@ class S3Backend(KeyValueStoreBackend):
         if config is not None:
             if not isinstance(config, dict):
                 raise ImproperlyConfigured(
-                    'S3 backend settings should be grouped in a dict')
-            self.aws_access_key_id = config.get('aws_access_key_id',
-                                            self.aws_access_key_id)
-            self.aws_secret_access_key = config.get('aws_secret_access_key',
-                                            self.aws_secret_access_key)
-            self.bucket_name = config.get('bucket', self.bucket_name)
-            self.base_path = config.get('base_path', self.base_path)
+                    'S3 backend settings should be grouped in a dict',
+                )
+            self.aws_access_key_id = config.get(
+                'aws_access_key_id',
+                self.aws_access_key_id,
+            )
+            self.aws_secret_access_key = config.get(
+                'aws_secret_access_key',
+                self.aws_secret_access_key,
+            )
+            self.bucket_name = config.get(
+                'bucket',
+                self.bucket_name,
+            )
+            self.base_path = config.get(
+                'base_path',
+                self.base_path,
+            )
 
     def _get_key(self, key):
         k = Key(self. s3_bucket)
@@ -56,5 +66,8 @@ class S3Backend(KeyValueStoreBackend):
 
     @cached_property
     def s3_bucket(self):
-        conn = S3Connection(self.aws_access_key_id, self.aws_secret_access_key)
+        conn = S3Connection(
+            self.aws_access_key_id,
+            self.aws_secret_access_key,
+        )
         return Bucket(connection=conn, name=self.bucket_name)
