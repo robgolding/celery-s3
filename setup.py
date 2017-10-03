@@ -23,6 +23,11 @@ setup(
     test_suite='celery_s3.tests',
     classifiers=[
         'Development Status :: 3 - Alpha',
+        'Programming Language :: Python',
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
         'License :: OSI Approved :: BSD License',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: System :: Distributed Computing',

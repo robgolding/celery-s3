@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import absolute_import, unicode_literals
+
 from unittest import TestCase
 
 from celery import Celery
@@ -43,6 +47,7 @@ class S3BackendTest(TestCase):
             '',
         )
 
+        # test base path config
         app = self.get_app({
             'CELERY_RESULT_BACKEND': 'celery_s3.backends.S3Backend',
             'CELERY_S3_BACKEND_SETTINGS': {
@@ -55,6 +60,21 @@ class S3BackendTest(TestCase):
         self.assertEqual(
             app.backend.base_path,
             '/celery/',
+        )
+
+        # test base path config with unicode
+        app = self.get_app({
+            'CELERY_RESULT_BACKEND': 'celery_s3.backends.S3Backend',
+            'CELERY_S3_BACKEND_SETTINGS': {
+                'aws_access_key_id': 'test_key_id',
+                'aws_secret_access_key': 'test_secret_access_key',
+                'bucket': 'test_bucket',
+                'base_path': '/celery/hellø/',
+            },
+        })
+        self.assertEqual(
+            app.backend.base_path,
+            '/celery/hellø/',
         )
 
     @patch('celery_s3.backends.s3.Key')
@@ -72,7 +92,7 @@ class S3BackendTest(TestCase):
         mock_key_instance.get_contents_as_string.return_value = 'TEST VALUE'
         mock_key_cls.return_value = mock_key_instance
         self.assertEqual(
-            app.backend.get('test'),
+            app.backend.get('teßt'),
             'TEST VALUE',
         )
         self.assertEqual(
@@ -87,7 +107,7 @@ class S3BackendTest(TestCase):
         )
         self.assertEqual(
             mock_key_instance.key,
-            '/celery/test',
+            '/celery/teßt',
         )
 
     @patch('celery_s3.backends.s3.Key')
@@ -103,7 +123,7 @@ class S3BackendTest(TestCase):
         })
         mock_key_instance = Mock()
         mock_key_cls.return_value = mock_key_instance
-        app.backend.set('test', 'TEST VALUE')
+        app.backend.set('teßt', 'TEßT VALUE')
         self.assertEqual(
             len(mock_key_cls.call_args_list),
             1,
@@ -116,7 +136,7 @@ class S3BackendTest(TestCase):
         )
         self.assertEqual(
             mock_key_instance.key,
-            '/celery/test',
+            '/celery/teßt',
         )
         self.assertEqual(
             len(mock_key_instance.set_contents_from_string.call_args_list),
@@ -136,7 +156,7 @@ class S3BackendTest(TestCase):
         })
         mock_key_instance = Mock()
         mock_key_cls.return_value = mock_key_instance
-        app.backend.delete('test')
+        app.backend.delete('teßt')
         self.assertEqual(
             len(mock_key_cls.call_args_list),
             1,
@@ -149,7 +169,7 @@ class S3BackendTest(TestCase):
         )
         self.assertEqual(
             mock_key_instance.key,
-            '/celery/test',
+            '/celery/teßt',
         )
         self.assertEqual(
             len(mock_key_instance.delete.call_args_list),
