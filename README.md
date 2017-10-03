@@ -41,6 +41,15 @@ To use a folder within the specified bucket, set the `base_path` in your
         ...
     }
 
+To use a region other than the default (`us-east-1`), set the `aws_region`
+parameter:
+
+    CELERY_S3_BACKEND_SETTINGS = {
+        ...
+        'aws_region': 'us-east-1',
+        ...
+    }
+
 ## Notes
 
 Storing Celery results with this backend will obviously result in API calls

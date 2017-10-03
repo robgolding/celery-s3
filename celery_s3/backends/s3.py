@@ -2,12 +2,15 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
+from boto.s3 import connect_to_region
 from boto.s3.bucket import Bucket
-from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from celery.backends.base import KeyValueStoreBackend
 from celery.exceptions import ImproperlyConfigured
 from kombu.utils import cached_property
+
+
+DEFAULT_REGION = 'us-east-1'
 
 
 class S3Backend(KeyValueStoreBackend):
@@ -17,6 +20,7 @@ class S3Backend(KeyValueStoreBackend):
     supports_native_join = False
     implements_incr = False
 
+    aws_region = None
     aws_access_key_id = None
     aws_secret_access_key = None
     bucket_name = None
@@ -30,6 +34,10 @@ class S3Backend(KeyValueStoreBackend):
                 raise ImproperlyConfigured(
                     'S3 backend settings should be grouped in a dict',
                 )
+            self.aws_region = config.get(
+                'aws_region',
+                DEFAULT_REGION,
+            )
             self.aws_access_key_id = config.get(
                 'aws_access_key_id',
                 self.aws_access_key_id,
@@ -68,8 +76,11 @@ class S3Backend(KeyValueStoreBackend):
 
     @cached_property
     def s3_bucket(self):
-        conn = S3Connection(
-            self.aws_access_key_id,
-            self.aws_secret_access_key,
+        conn = connect_to_region(
+            self.aws_region,
+            aws_access_key_id=self.aws_access_key_id,
+            aws_secret_access_key=self.aws_secret_access_key,
+            is_secure=True,
+            # calling_format = OrdinaryCallingFormat(),
         )
         return Bucket(connection=conn, name=self.bucket_name)
