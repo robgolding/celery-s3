@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import os
 
 from boto.s3.bucket import Bucket
