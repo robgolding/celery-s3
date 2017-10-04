@@ -31,6 +31,10 @@ class S3BackendTest(TestCase):
             S3Backend,
         )
         self.assertEqual(
+            app.backend.aws_region,
+            'us-east-1',
+        )
+        self.assertEqual(
             app.backend.aws_access_key_id,
             'test_key_id',
         )
@@ -47,16 +51,21 @@ class S3BackendTest(TestCase):
             '',
         )
 
-        # test base path config
+        # test region and base path config
         app = self.get_app({
             'CELERY_RESULT_BACKEND': 'celery_s3.backends.S3Backend',
             'CELERY_S3_BACKEND_SETTINGS': {
+                'aws_region': 'us-west-1',
                 'aws_access_key_id': 'test_key_id',
                 'aws_secret_access_key': 'test_secret_access_key',
                 'bucket': 'test_bucket',
                 'base_path': '/celery/',
             },
         })
+        self.assertEqual(
+            app.backend.aws_region,
+            'us-west-1',
+        )
         self.assertEqual(
             app.backend.base_path,
             '/celery/',
@@ -78,10 +87,41 @@ class S3BackendTest(TestCase):
         )
 
     @patch('celery_s3.backends.s3.Key')
+    def test_s3_backend_bucket_region(self, mock_key_cls):
+        app = self.get_app({
+            'CELERY_RESULT_BACKEND': 'celery_s3.backends.S3Backend',
+            'CELERY_S3_BACKEND_SETTINGS': {
+                'aws_region': 'us-west-1',
+                'aws_access_key_id': 'test_key_id',
+                'aws_secret_access_key': 'test_secret_access_key',
+                'bucket': 'test_bucket',
+                'base_path': '/celery/',
+            },
+        })
+        mock_key_instance = Mock()
+        mock_key_instance.get_contents_as_string.return_value = 'TEST VALUE'
+        mock_key_cls.return_value = mock_key_instance
+        self.assertEqual(
+            app.backend.get('teßt'),
+            'TEST VALUE',
+        )
+        self.assertEqual(
+            len(mock_key_cls.call_args_list),
+            1,
+        )
+        call = mock_key_cls.call_args_list[0]
+        bucket = call[0][0]
+        self.assertEqual(
+            bucket.connection.host,
+            's3-us-west-1.amazonaws.com',
+        )
+
+    @patch('celery_s3.backends.s3.Key')
     def test_s3_backend_get(self, mock_key_cls):
         app = self.get_app({
             'CELERY_RESULT_BACKEND': 'celery_s3.backends.S3Backend',
             'CELERY_S3_BACKEND_SETTINGS': {
+                'aws_region': 'us-west-1',
                 'aws_access_key_id': 'test_key_id',
                 'aws_secret_access_key': 'test_secret_access_key',
                 'bucket': 'test_bucket',
