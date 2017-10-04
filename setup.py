@@ -6,7 +6,7 @@ requirements = [
 
 setup(
     name='celery-s3',
-    version='0.1',
+    version='1.0.0',
     description='An S3 result store backend for Celery',
     long_description=open('README.md').read(),
     author='Rob Golding',
