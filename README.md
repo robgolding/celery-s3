@@ -50,6 +50,15 @@ parameter:
         ...
     }
 
+To use [reduced redundancy storage](https://aws.amazon.com/s3/reduced-redundancy/),
+set the `reduced_redundancy` parameter:
+
+    CELERY_S3_BACKEND_SETTINGS = {
+        ...
+        'reduced_redundancy': True,
+        ...
+    }
+
 ## Notes
 
 Storing Celery results with this backend will obviously result in API calls

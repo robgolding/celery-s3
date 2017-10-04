@@ -50,8 +50,12 @@ class S3BackendTest(TestCase):
             app.backend.base_path,
             '',
         )
+        self.assertEqual(
+            app.backend.reduced_redundancy,
+            False,
+        )
 
-        # test region and base path config
+        # test region, base path and rr config
         app = self.get_app({
             'CELERY_RESULT_BACKEND': 'celery_s3.backends.S3Backend',
             'CELERY_S3_BACKEND_SETTINGS': {
@@ -60,6 +64,7 @@ class S3BackendTest(TestCase):
                 'aws_secret_access_key': 'test_secret_access_key',
                 'bucket': 'test_bucket',
                 'base_path': '/celery/',
+                'reduced_redundancy': True,
             },
         })
         self.assertEqual(
@@ -69,6 +74,10 @@ class S3BackendTest(TestCase):
         self.assertEqual(
             app.backend.base_path,
             '/celery/',
+        )
+        self.assertEqual(
+            app.backend.reduced_redundancy,
+            True,
         )
 
         # test base path config with unicode
@@ -169,7 +178,8 @@ class S3BackendTest(TestCase):
             1,
         )
         call = mock_key_cls.call_args_list[0]
-        bucket = call[0][0]
+        args, kwargs = call
+        bucket = args[0]
         self.assertEqual(
             bucket.name,
             'test_bucket',
@@ -178,9 +188,44 @@ class S3BackendTest(TestCase):
             mock_key_instance.key,
             '/celery/teßt',
         )
+        calls = mock_key_instance.set_contents_from_string.call_args_list
         self.assertEqual(
-            len(mock_key_instance.set_contents_from_string.call_args_list),
+            len(calls),
             1,
+        )
+        args, kwargs = calls[0]
+        self.assertEqual(args[0], 'TEßT VALUE')
+        self.assertEqual(
+            kwargs,
+            {
+                'reduced_redundancy': False,
+            },
+        )
+
+        app = self.get_app({
+            'CELERY_RESULT_BACKEND': 'celery_s3.backends.S3Backend',
+            'CELERY_S3_BACKEND_SETTINGS': {
+                'aws_access_key_id': 'test_key_id',
+                'aws_secret_access_key': 'test_secret_access_key',
+                'bucket': 'test_bucket',
+                'base_path': '/celery/',
+                'reduced_redundancy': True,
+            },
+        })
+        app.backend.set('teßt', 'TEßT VALUE')
+
+        calls = mock_key_instance.set_contents_from_string.call_args_list
+        self.assertEqual(
+            len(calls),
+            2,
+        )
+        args, kwargs = calls[1]
+        self.assertEqual(args[0], 'TEßT VALUE')
+        self.assertEqual(
+            kwargs,
+            {
+                'reduced_redundancy': True,
+            },
         )
 
     @patch('celery_s3.backends.s3.Key')
