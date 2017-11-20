@@ -25,6 +25,7 @@ class S3Backend(KeyValueStoreBackend):
     aws_secret_access_key = None
     bucket_name = None
     reduced_redundancy = False
+    encrypt_key = False
     base_path = ''
 
     def __init__(self, **kwargs):
@@ -55,6 +56,10 @@ class S3Backend(KeyValueStoreBackend):
                 'reduced_redundancy',
                 self.reduced_redundancy,
             )
+	    self.encrypt_key = config.get(
+		'encrypt_key', 
+		self.encrypt_key,
+	    )
             self.base_path = config.get(
                 'base_path',
                 self.base_path,
@@ -77,6 +82,7 @@ class S3Backend(KeyValueStoreBackend):
         return self._get_key(key).set_contents_from_string(
             value,
             reduced_redundancy=self.reduced_redundancy,
+	    encrypt_key=self.encrypt_key
         )
 
     def delete(self, key):

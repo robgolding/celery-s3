@@ -59,6 +59,15 @@ set the `reduced_redundancy` parameter:
         ...
     }
 
+To use [server-side encryption](http://docs.aws.amazon.com/AmazonS3/latest/dev/serv-side-encryption.html),
+set the `encrypt_key` parameter:
+
+    CELERY_S3_BACKEND_SETTINGS = {
+        ...
+        'encrypt_key': True,
+        ...
+    }
+
 ## Notes
 
 Storing Celery results with this backend will obviously result in API calls
