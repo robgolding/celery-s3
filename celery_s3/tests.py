@@ -224,6 +224,7 @@ class S3BackendTest(TestCase):
             kwargs,
             {
                 'reduced_redundancy': False,
+                'encrypt_key': False,
             },
         )
 
@@ -250,6 +251,7 @@ class S3BackendTest(TestCase):
             kwargs,
             {
                 'reduced_redundancy': True,
+                'encrypt_key': False,
             },
         )
 
