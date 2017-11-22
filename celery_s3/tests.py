@@ -95,6 +95,31 @@ class S3BackendTest(TestCase):
             '/celery/hellø/',
         )
 
+        # test region, base path and rr config
+        app = self.get_app({
+            'CELERY_RESULT_BACKEND': 'celery_s3.backends.S3Backend',
+            'CELERY_S3_BACKEND_SETTINGS': {
+                'aws_region': 'us-west-1',
+                'aws_access_key_id': 'test_key_id',
+                'aws_secret_access_key': 'test_secret_access_key',
+                'bucket': 'test_bucket',
+                'base_path': '/celery/',
+                'encrypt_key': True,
+            },
+        })
+        self.assertEqual(
+            app.backend.aws_region,
+            'us-west-1',
+        )
+        self.assertEqual(
+            app.backend.base_path,
+            '/celery/',
+        )
+        self.assertEqual(
+            app.backend.encrypt_key,
+            True,
+        )
+
     @patch('celery_s3.backends.s3.Key')
     def test_s3_backend_bucket_region(self, mock_key_cls):
         app = self.get_app({
@@ -199,6 +224,7 @@ class S3BackendTest(TestCase):
             kwargs,
             {
                 'reduced_redundancy': False,
+                'encrypt_key': False,
             },
         )
 
@@ -225,6 +251,7 @@ class S3BackendTest(TestCase):
             kwargs,
             {
                 'reduced_redundancy': True,
+                'encrypt_key': False,
             },
         )
 
